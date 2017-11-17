@@ -13,16 +13,19 @@ module ALU(buttons, busIn, busOut, error, flags, clk);
 	
 	output [n-1:0] busOut;
 	output [3:0] flags; // negative, A>B, A=B, A<B
-	wire [n-1:0] flagBuffer;
+	wire [2:0] flagBuffer;
 	
 	
 	output [2:0] error; // +ovfl, -udlf, xtrunc
 	wire [2:0] errBuffer;
 	
-	wire [3:0] enc;
+	wire [3:0] enc, opIn, opOut;
+	
 						 // opMux   A    B
 	wire [18:0] control; // [ 8:0][3:0][3:0]
 						 // [18:8][7:4][3:0]
+	
+	
 	
 	wire [n-1:0] Ain, Aout;
 	wire [n-1:0] Bin, Bout;
@@ -40,9 +43,17 @@ module ALU(buttons, busIn, busOut, error, flags, clk);
 	Encoder16x4 encode ({1'b0,buttons,1'b0}, enc);
 	
 	
+	Mux2 #(4) opMux( 4'b0000, enc, opOut[0]|opOut[1]|opOut[2]|opOut[3] , opIn);
+	
+	DFF #(4) opReg(clk, opIn, opOut);
+	
+	
+	
+	
+	
 	// CONTROL LOGIC	
 	//	4bit			11bit   4bit	4bit
-	//	Enc		OpName	ALUop	Aop		Bop
+	//	opCode	name	Ans		A       B
 	//	0		Ø		0		0		0		No Operation		(Ø)
 	//	1		+		2		0		0		Addition			(Ans = A + B)
 	//	2		-		3		0		0		Subtraction			(Ans = A - B)
@@ -62,49 +73,47 @@ module ALU(buttons, busIn, busOut, error, flags, clk);
 	// 
 	// Table to Opcode : (1 << table[operation])
 	
+	// Module Opcode (OpCtrlAns)
+	assign control[18:8] =  (((11'd1) <<  0) & ({11{opOut ==   0}}|
+												{11{opOut ==   8}}|
+												{11{opOut ==   9}}|
+												{11{opOut ==  10}}|
+												{11{opOut ==  11}})) |
+							(((11'd1) <<  1) & {11{opOut == 12}}) |
+							(((11'd1) <<  2) & {11{opOut ==  1}}) | 
+							(((11'd1) <<  3) & {11{opOut ==  2}}) |
+							(((11'd1) <<  4) & {11{opOut ==  3}}) |
+							(((11'd1) <<  5) & {11{opOut ==  4}}) |
+							(((11'd1) <<  6) & {11{opOut ==  5}}) |
+							(((11'd1) <<  7) & {11{opOut ==  7}}) |
+							(((11'd1) <<  8) & {11{opOut ==  6}}) |
+							(((11'd1) <<  9) & {11{opOut == 13}}) |
+							(((11'd1) << 10) & {11{opOut == 14}});
 	
+	// A Opcode (OpCtrlA)
+	assign control[3:0] = (4'b1000 & {4{opOut == 12}}) | 
+						  (4'b0100 & {4{opOut == 10}}) | 
+						  (4'b0010 & {4{opOut ==  8}}) |
+						  (4'b0001 & {4{(opOut != 12) && (opOut != 10) && (opOut != 8)}}); 
 	
-	// Module Opcode (ALUop)
-	assign control[18:8] =  (((11'd1) <<  0) & ({11{enc ==   0}}|
-												{11{enc ==   8}}|
-												{11{enc ==   9}}|
-												{11{enc ==  10}}|
-												{11{enc ==  11}})) |
-							(((11'd1) <<  1) & {11{enc == 12}}) |
-							(((11'd1) <<  2) & {11{enc ==  1}}) | 
-							(((11'd1) <<  3) & {11{enc ==  2}}) |
-							(((11'd1) <<  4) & {11{enc ==  3}}) |
-							(((11'd1) <<  5) & {11{enc ==  4}}) |
-							(((11'd1) <<  6) & {11{enc ==  5}}) |
-							(((11'd1) <<  7) & {11{enc ==  7}}) |
-							(((11'd1) <<  8) & {11{enc ==  6}}) |
-							(((11'd1) <<  9) & {11{enc == 13}}) |
-							(((11'd1) << 10) & {11{enc == 14}});
-	
-	// A Opcode (Aop)
-	assign control[3:0] = (4'b1000 & {4{enc == 12}}) | 
-						  (4'b0100 & {4{enc == 10}}) | 
-						  (4'b0010 & {4{enc ==  8}}) |
-						  (4'b0001 & {4{(enc != 12) && (enc != 10) && (enc != 8)}}); 
-	
-	// B Opcode (Bop)
-	assign control[7:4] = (4'b1000 & {4{enc == 12}}) | 
-						  (4'b0100 & {4{enc == 11}}) | 
-						  (4'b0010 & {4{enc ==  9}}) |
-						  (4'b0001 & {4{(enc != 12) && (enc != 11) && (enc != 9)}}); 
+	// B Opcode (OpCtrlB)
+	assign control[7:4] = (4'b1000 & {4{opOut == 12}}) | 
+						  (4'b0100 & {4{opOut == 11}}) | 
+						  (4'b0010 & {4{opOut ==  9}}) |
+						  (4'b0001 & {4{(opOut != 12) && (opOut != 11) && (opOut != 9)}}); 
 	
 	
 	// control 1000 - clear (0)
 	// control 0100 - ans   (busOut)
 	// control 0010 - input (busIn)
-	// control 0001 - no op (A)
+	// control 0001 - no op (Aout)
 	Mux4 amux( {n{1'b0}}, busOut, busIn, Aout, control[7:4],Ain );
 	DFF Areg(clk, Ain, Aout);
 	
 	// control 1000 - clear (0)
 	// control 0100 - ans   (busOut)
 	// control 0010 - input (busIn)
-	// control 0001 - no op (A)
+	// control 0001 - no op (Bout)
 	Mux4 bmux( {n{1'b0}}, busOut, busIn, Bout, control[3:0] ,Bin );
 	DFF Breg(clk, Bin, Bout);
 	
@@ -119,40 +128,39 @@ module ALU(buttons, busIn, busOut, error, flags, clk);
 	
 	
 	// Only output error flags when the operation that causes the error is selected
-	assign error[2] = errBuffer[2] & {11{(enc == 1)}};
-	assign error[1] = errBuffer[1] & {11{(enc == 2)}};
-	assign error[0] = errBuffer[0] & {11{(enc == 3)}};
+	assign error[2] = errBuffer[2] & {11{(opOut == 1)}};
+	assign error[1] = errBuffer[1] & {11{(opOut == 2)}};
+	assign error[0] = errBuffer[0] & {11{(opOut == 3)}};
 	
 	
-	//OpMux     Input      // Control Code
-	Mux16 opMux({n{1'b0}}, // 15- no op
-				{n{1'b0}}, // 14- no op
-				{n{1'b0}}, // 13- no op
-				{n{1'b0}}, // 12- no op
-				{n{1'b0}}, // 11- no op
-				Bout,      // 10- B
-				Aout,      // 9 - A
-				notW,      // 8 - bitwise NOT A
-				xorW,      // 7 - bitwise XOR
-				orW,       // 6 - bitwise OR
-				andW,      // 5 - bitwise AND
-				mltW,      // 4 - multiply
-				subW,      // 3 - sub
-				addW, 	   // 2 - add
-				{n{1'b0}}, // 1 - clear
-				busOut,    // 0 - no op
+	//AnsMux    Input      // Control Code
+	Mux16 ansMux({n{1'b0}}, // 15- no op
+				 {n{1'b0}}, // 14- no op
+				 {n{1'b0}}, // 13- no op
+				 {n{1'b0}}, // 12- no op
+				 {n{1'b0}}, // 11- no op
+				 Bout,      // 10- B
+				 Aout,      // 9 - A
+				 notW,      // 8 - bitwise NOT A
+				 xorW,      // 7 - bitwise XOR
+				 orW,       // 6 - bitwise OR
+				 andW,      // 5 - bitwise AND
+				 mltW,      // 4 - multiply
+				 subW,      // 3 - sub
+				 addW, 	   // 2 - add
+				 {n{1'b0}}, // 1 - clear
+				 busOut,    // 0 - no op
 				
-				{5'b0,control[18:8]}, 
-				ansIn) ;
+				 {5'b0,control[18:8]}, 
+				 ansIn) ;
 	DFF ans(clk, ansIn, busOut);
 	
 	
 	// Magnitude Flags
 	// Flags: {negative, A>B, A=B, A<B}
-	MagComp comparator(Aout, Bout, flagBuffer, flags[1]);
+	MagComp comparator(Aout, Bout, flags[2:0]);
 	assign flags[3] = busOut[n-1];
-	assign flags[2] = flagBuffer[n-1] & ~(flags[1]);
-	assign flags[0] = (~flagBuffer[n-1]) & ~(flags[1]);
+	
 
 endmodule
 
@@ -215,6 +223,17 @@ module Mux4(a3, a2, a1, a0, s, b) ;
              ({n{s[1]}} & a1) |
              ({n{s[0]}} & a0) ;
 endmodule // Mux4 
+
+
+module Mux2(a1, a0, s, b) ;
+  parameter n = 16 ;
+  input [n-1:0] a1, a0 ;  // inputs
+  input s ; // 0 selects a0, 1 selects a1
+  output[n-1:0] b ;
+  assign b = ({n{ s}} & a1) | 
+             ({n{~s}} & a0);
+endmodule // Mux2
+
 
 module DFF(clk,in,out);
   parameter n = 16 ;//width
