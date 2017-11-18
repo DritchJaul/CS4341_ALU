@@ -1,4 +1,172 @@
 
+//Testbench
+//Apparently these dont work, because verilog sucks
+`define NUL = 14'b00000000000000;
+`define ADD = 14'b00000000000001;
+`define SUB = 14'b00000000000010;
+`define MUL = 14'b00000000000100;
+`define AND = 14'b00000000001000;
+`define OR  = 14'b00000000010000;
+`define NOT = 14'b00000000100000;
+`define XOR = 14'b00000001000000;
+`define ldA = 14'b00000010000000;
+`define ldB = 14'b00000100000000;
+`define AnA = 14'b00001000000000;
+`define AnB = 14'b00010000000000;
+`define CLR = 14'b00100000000000;
+`define BAn = 14'b01000000000000;
+`define AAn = 14'b10000000000000;
+//$display("--------------------------+----------------+---------------------------+----------");
+
+module testbench ;
+	
+	reg [15:0] busIn;
+	reg [13:0] buttons;
+	
+	reg clk;
+	
+	wire [15:0] busOut;
+	wire [2:0] error;
+	wire [3:0] flags;
+	
+	ALU alu(buttons, busIn, busOut, error, flags, clk);
+	
+	always #5 clk = ~clk;
+	//always #5 $display(clk);
+	
+	initial begin
+		clk = 0;
+		busIn = 0;
+	// Buttons: { AAns, BAns, Clr, AnsB, AnsA, ldB, ldA, ^, ~, |, &, x, -, +}	
+	// Flags:   { negative, A>B, A=B, B>A }
+	// Error:   { (+)overflow, (-)underflow, (x)truncation }
+		buttons = 14'b00000000000000;
+		//assign busOut = 0;
+		//assign error = 0;
+		//assign flags = 0;
+		
+			$display("    Input                    Buttons	A:B|>|=|<|neg      Ans                   Error(overflow, underflow, trunc)");
+			$display("--------------------------+----------------+-+-+-+-+---------------------------+---+");
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| initial",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+			//Functionality
+			busIn = 8;
+		buttons = 14'b00000010000000;
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| loads input to A",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+		buttons = 14'b10000000000000;
+		busIn = 0;
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Ans = A",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+		busIn = 2;
+		buttons = 14'b00000100000000; 
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| loads input to B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+		buttons = 14'b01000000000000;	
+		busIn = 0;
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Ans = B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+		buttons = 14'b00001000000000;
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| A = Ans",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+		buttons = 14'b10000000000000;
+		busIn = 0;
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Ans = A",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+			busIn = 8;
+		buttons = 14'b00000010000000;
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| loads input to A",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+		buttons = 14'b10000000000000;
+		busIn = 0;
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Ans = A",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+		buttons = 14'b00010000000000;
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| B = Ans",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+		buttons = 14'b01000000000000;
+		busIn = 0;
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Ans = B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+		buttons = 14'b00100000000000;		
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Clear A, B, and Ans",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+			$display("--------------------------+----------------+-+-+-+-+---------------------------+---+");
+		
+			//ADD
+			busIn = 2;
+		buttons = 14'b00000010000000;
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| loads input to A",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+		busIn = 3;
+		buttons = 14'b00000100000000;
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| loads input to B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+		buttons = 14'b00000000000001;
+		busIn = 0;
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Ans = A + B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+		buttons = 14'b00100000000000;
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Clear A, B, and Ans",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+			$display("--------------------------+----------------+-+-+-+-+---------------------------+---+");
+			//SUB
+			busIn = 27;
+		buttons = 14'b00000010000000;
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| loads input to A",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+		busIn = 37; // ALU IS DOING B - A, NOT A - B like we want
+		buttons = 14'b00000100000000; 
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| loads input to B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+		buttons = 14'b00000000000010;
+		busIn = 0;
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Ans = A - B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+		buttons = 14'b00100000000000;
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Clear A, B, and Ans",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+			$display("--------------------------+----------------+-+-+-+-+---------------------------+---+");
+			//MUL
+			busIn = 6;
+		buttons = 14'b00000010000000;
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| loads input to A",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+		busIn = 5;
+		buttons = 14'b00000100000000; 
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| loads input to B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+		buttons = 14'b00000000000100;
+		busIn = 0;
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Ans = A*B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+		buttons = 14'b00100000000000;		
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Clear A, B, and Ans",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+			$display("--------------------------+----------------+-+-+-+-+---------------------------+---+");
+			//AND
+		busIn = 6;
+		buttons = 14'b00000010000000;
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| load input to A",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+		busIn = 5;
+		buttons = 14'b00000100000000; 
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| loads input to B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+		buttons = 14'b00000000001000;
+		busIn = 0;
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Ans = A AND B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+		buttons = 14'b00100000000000;		
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Clear A, B, and Ans",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+			$display("--------------------------+----------------+-+-+-+-+---------------------------+---+");
+			//OR
+			busIn = 6;
+		buttons = 14'b00000010000000;
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| load input to A",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+		busIn = 5;
+		buttons = 14'b00000100000000; 
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| load input to B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+		buttons = 14'b00000000010000;
+		busIn = 0;
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Ans = A OR B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+		buttons = 14'b00100000000000;		
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Clear A, B, and Ans",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+			$display("--------------------------+----------------+-+-+-+-+---------------------------+---+");
+			//XOR
+			busIn = 6;
+		buttons = 14'b00000010000000;
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| load input to A",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+		busIn = 5;
+		buttons = 14'b00000100000000; 
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| load input to B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+		buttons = 14'b00000001000000;
+		busIn = 0;
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| A XOR B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+		buttons = 14'b00100000000000;		
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Clear A, B, and Ans",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+			$display("--------------------------+----------------+-+-+-+-+---------------------------+---+");
+		
+		#1000 $stop;
+	end
+	
+endmodule
+
+
+
 // Buttons: { AAns, BAns, Clr, AnsB, AnsA, ldB, ldA, ^, ~, |, &, x, -, +}
 // BusIn:   16 bit input 
 // Error:   { (+)overflow, (-)underflow, (x)truncation }
@@ -119,7 +287,7 @@ module ALU(buttons, busIn, busOut, error, flags, clk);
 	
 	// ALU MODULES (+,-,x,&,|,^,~)
 	Adder      addM(Aout, Bout, addW, errBuffer[2]);
-	Subtractor subM(Aout, Bout, subW, errBuffer[1]);
+	Subtractor subM(Bout, Aout, subW, errBuffer[1]);
 	Multiplier mltM(Aout, Bout, mltW, errBuffer[0]);
 	And 	   andM(Aout, Bout, andW);
 	Or 	   	   orM (Aout, Bout, orW);
