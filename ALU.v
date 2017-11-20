@@ -1,6 +1,5 @@
 
 //Testbench
-//Apparently these dont work, because verilog sucks
 `define NUL = 14'b00000000000000;
 `define ADD = 14'b00000000000001;
 `define SUB = 14'b00000000000010;
@@ -31,12 +30,13 @@ module testbench ;
 	
 	ALU alu(buttons, busIn, busOut, error, flags, clk);
 	
-	always #5 clk = ~clk;
+	always #1 clk = ~clk;
 	//always #5 $display(clk);
 	
 	initial begin
 		clk = 0;
 		busIn = 0;
+		#1 $display("--Starting ALU : Test Team Please Ignore, CS4341.501--");
 	// Buttons: { AAns, BAns, Clr, AnsB, AnsA, ldB, ldA, ^, ~, |, &, x, -, +}	
 	// Flags:   { negative, A>B, A=B, B>A }
 	// Error:   { (+)overflow, (-)underflow, (x)truncation }
@@ -47,125 +47,165 @@ module testbench ;
 		
 			$display("    Input                    Buttons	A:B|>|=|<|neg      Ans                   Error(overflow, underflow, trunc)");
 			$display("--------------------------+----------------+-+-+-+-+---------------------------+---+");
-		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| initial",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut,  $signed(busOut), error);
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| initial",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, $signed(busOut), error);
 			//Functionality
 			busIn = 8;
 		buttons = 14'b00000010000000;
-		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| loads input to A",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut,  $signed(busOut), error);
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| loads input to A",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
 		buttons = 14'b10000000000000;
 		busIn = 0;
-		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Ans = A",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut,  $signed(busOut), error);
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Ans = A",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
 		busIn = 2;
 		buttons = 14'b00000100000000; 
-		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| loads input to B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut,  $signed(busOut), error);
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| loads input to B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
 		buttons = 14'b01000000000000;	
 		busIn = 0;
-		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Ans = B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut,  $signed(busOut), error);
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Ans = B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
 		buttons = 14'b00001000000000;
-		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| A = Ans",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut,  $signed(busOut), error);
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| A = Ans",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
 		buttons = 14'b10000000000000;
 		busIn = 0;
-		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Ans = A",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut,  $signed(busOut), error);
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Ans = A",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
 			busIn = 8;
 		buttons = 14'b00000010000000;
-		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| loads input to A",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut,  $signed(busOut), error);
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| loads input to A",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
 		buttons = 14'b10000000000000;
 		busIn = 0;
-		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Ans = A",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut,  $signed(busOut), error);
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Ans = A",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
 		buttons = 14'b00010000000000;
-		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| B = Ans",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut,  $signed(busOut), error);
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| B = Ans",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
 		buttons = 14'b01000000000000;
 		busIn = 0;
-		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Ans = B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut,  $signed(busOut), error);
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Ans = B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
 		buttons = 14'b00100000000000;		
-		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Clear A, B, and Ans",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut,  $signed(busOut), error);
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Clear A, B, and Ans",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
 			$display("--------------------------+----------------+-+-+-+-+---------------------------+---+");
 		
 			//ADD
 			busIn = 2;
 		buttons = 14'b00000010000000;
-		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| loads input to A",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut,  $signed(busOut), error);
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| loads input to A",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
 		busIn = 3;
 		buttons = 14'b00000100000000;
-		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| loads input to B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut,  $signed(busOut), error);
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| loads input to B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
 		buttons = 14'b00000000000001;
 		busIn = 0;
-		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Ans = A + B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut,  $signed(busOut), error);
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Ans = A + B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
 		buttons = 14'b00100000000000;
-		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Clear A, B, and Ans",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut,  $signed(busOut), error);
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Clear A, B, and Ans",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
 			$display("--------------------------+----------------+-+-+-+-+---------------------------+---+");
 			//SUB
-			busIn = 27;
+			busIn = 37;
 		buttons = 14'b00000010000000;
-		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| loads input to A",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut,  $signed(busOut), error);
-		busIn = 37; // ALU IS DOING B - A, NOT A - B like we want
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| loads input to A",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+		busIn = 27;
 		buttons = 14'b00000100000000; 
-		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| loads input to B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut,  $signed(busOut), error);
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| loads input to B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
 		buttons = 14'b00000000000010;
 		busIn = 0;
-		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Ans = A - B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut,  $signed(busOut), error);
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Ans = A - B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, $signed(busOut), error);
 		buttons = 14'b00100000000000;
-		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Clear A, B, and Ans",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut,  $signed(busOut), error);
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Clear A, B, and Ans",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
 			$display("--------------------------+----------------+-+-+-+-+---------------------------+---+");
 			//MUL
 			busIn = 6;
 		buttons = 14'b00000010000000;
-		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| loads input to A",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut,  $signed(busOut), error);
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| loads input to A",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
 		busIn = 5;
 		buttons = 14'b00000100000000; 
-		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| loads input to B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut,  $signed(busOut), error);
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| loads input to B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
 		buttons = 14'b00000000000100;
 		busIn = 0;
-		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Ans = A*B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut,  $signed(busOut), error);
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Ans = A*B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
 		buttons = 14'b00100000000000;		
-		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Clear A, B, and Ans",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut,  $signed(busOut), error);
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Clear A, B, and Ans",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
 			$display("--------------------------+----------------+-+-+-+-+---------------------------+---+");
 			//AND
 		busIn = 6;
 		buttons = 14'b00000010000000;
-		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| load input to A",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut,  $signed(busOut), error);
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| load input to A",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
 		busIn = 5;
 		buttons = 14'b00000100000000; 
-		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| loads input to B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut,  $signed(busOut), error);
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| loads input to B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
 		buttons = 14'b00000000001000;
 		busIn = 0;
-		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Ans = A AND B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut,  $signed(busOut), error);
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Ans = A AND B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
 		buttons = 14'b00100000000000;		
-		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Clear A, B, and Ans",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut,  $signed(busOut), error);
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Clear A, B, and Ans",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
 			$display("--------------------------+----------------+-+-+-+-+---------------------------+---+");
 			//OR
 			busIn = 6;
 		buttons = 14'b00000010000000;
-		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| load input to A",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut,  $signed(busOut), error);
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| load input to A",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
 		busIn = 5;
 		buttons = 14'b00000100000000; 
-		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| load input to B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut,  $signed(busOut), error);
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| load input to B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
 		buttons = 14'b00000000010000;
 		busIn = 0;
-		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Ans = A OR B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut,  $signed(busOut), error);
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Ans = A OR B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
 		buttons = 14'b00100000000000;		
-		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Clear A, B, and Ans",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut,  $signed(busOut), error);
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Clear A, B, and Ans",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
 			$display("--------------------------+----------------+-+-+-+-+---------------------------+---+");
 			//XOR
 			busIn = 6;
 		buttons = 14'b00000010000000;
-		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| load input to A",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut,  $signed(busOut), error);
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| load input to A",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
 		busIn = 5;
 		buttons = 14'b00000100000000; 
-		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| load input to B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut,  $signed(busOut), error);
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| load input to B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
 		buttons = 14'b00000001000000;
 		busIn = 0;
-		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| A XOR B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut,  $signed(busOut), error);
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| A XOR B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
 		buttons = 14'b00100000000000;		
-		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Clear A, B, and Ans",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut,  $signed(busOut), error);
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Clear A, B, and Ans",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+			$display("--------------------------+----------------+-+-+-+-+---------------------------+---+");
+			
+			//Overflow test
+			busIn = 16000;
+		buttons = 14'b00000010000000;
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| load input to A",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+		busIn = 25000;
+		buttons = 14'b00000100000000; 
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| load input to B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+		buttons = 14'b00000000000001;
+		busIn = 0;
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Ans = A + B (should overflow)",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+		buttons = 14'b00100000000000;		
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Clear A, B, and Ans",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+			$display("--------------------------+----------------+-+-+-+-+---------------------------+---+");
+		
+		//Underflow test
+			busIn = 1;
+		buttons = 14'b00000010000000;
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| load input to A",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+		busIn = 40000;
+		buttons = 14'b00000100000000; 
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| load input to B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+		buttons = 14'b00000000000010;
+		busIn = 0;
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Ans = A - B (should underflow)",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, $signed(busOut), error);
+		buttons = 14'b00100000000000;		
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Clear A, B, and Ans",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+			$display("--------------------------+----------------+-+-+-+-+---------------------------+---+");
+			
+			//Trunc test
+			busIn = 16000;
+		buttons = 14'b00000010000000;
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| load input to A",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+		busIn = 25000;
+		buttons = 14'b00000100000000; 
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| load input to B",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+		buttons = 14'b00000000000100;
+		busIn = 0;
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Ans = A * B (should trunc)",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
+		buttons = 14'b00100000000000;		
+		#20 $display("%b %5d    | %b |%b|%b|%b|%b| %b %5d    |%b| Clear A, B, and Ans",busIn, busIn, buttons, flags[0], flags[1], flags[2], flags[3], busOut, busOut, error);
 			$display("--------------------------+----------------+-+-+-+-+---------------------------+---+");
 		
 		#1000 $stop;
 	end
 	
 endmodule
-
-
 
 // Buttons: { AAns, BAns, Clr, AnsB, AnsA, ldB, ldA, ^, ~, |, &, x, -, +}
 // BusIn:   16 bit input 
@@ -213,9 +253,15 @@ module ALU(buttons, busIn, busOut, error, flags, clk);
 	
 	Mux2 #(4) opMux( 4'b0000, enc, opOut[0]|opOut[1]|opOut[2]|opOut[3] , opIn);
 	
+	
+	
 	DFF #(4) opReg(clk, opIn, opOut);
 	
-	
+		
+	// Only output error flags when the operation that causes the error is selected
+	assign error[2] = errBuffer[2] & (opOut == 1);
+	assign error[1] = errBuffer[1] & (opOut == 2);
+	assign error[0] = errBuffer[0] & (opOut == 3);
 	
 	
 	
@@ -286,19 +332,15 @@ module ALU(buttons, busIn, busOut, error, flags, clk);
 	DFF Breg(clk, Bin, Bout);
 	
 	// ALU MODULES (+,-,x,&,|,^,~)
-	Adder      addM(Aout, Bout, addW, errBuffer[2]);
-	Subtractor subM(Bout, Aout, subW, errBuffer[1]);
+	Adder      addM(Aout, Bout, addW, errBuffer[2]);	
+	Subtractor subM(Aout, Bout, subW, errBuffer[1]);
 	Multiplier mltM(Aout, Bout, mltW, errBuffer[0]);
 	And 	   andM(Aout, Bout, andW);
 	Or 	   	   orM (Aout, Bout, orW);
 	Xor 	   xorM(Aout, Bout, xorW);
 	Not		   notM(Aout, notW);
 	
-	
-	// Only output error flags when the operation that causes the error is selected
-	assign error[2] = errBuffer[2] & {11{(opOut == 1)}};
-	assign error[1] = errBuffer[1] & {11{(opOut == 2)}};
-	assign error[0] = errBuffer[0] & {11{(opOut == 3)}};
+
 	
 	
 	//AnsMux    Input      // Control Code
@@ -424,12 +466,15 @@ endmodule
 module Adder(a, b, out, err) ; 
 	input [15:0] a;
 	input [15:0] b;
-
+	
+	wire[16:0] sum;
+	
 	output [15:0] out;
 	output err;
 	
-	assign out = a + b;
-	assign err = out > 32768; //OVERFLOW
+	assign sum = a + b;
+	assign err = sum[16]^sum[15]; //OVERFLOW
+	assign out = sum[15:0];
 endmodule
 
 //subtractor -
@@ -437,11 +482,14 @@ module Subtractor(a, b, out, err) ;
 	input [15:0] a;
 	input [15:0] b;
 
+	wire[16:0] diff;
+	
 	output [15:0] out;
 	output err;
 	
-	assign out = a - b;
-	assign err = out < -32768; //UNDERFLOW
+	assign diff = b-a;
+	assign err = diff[16]^diff[15]; //UNDERFLOW
+	assign out = diff[15:0];
 endmodule
 
 //multiplier x
